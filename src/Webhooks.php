@@ -30,6 +30,10 @@ class Webhooks
      * Verifies the signature and decodes the body in one step. Throws if the signature doesn't
      * match or the body isn't valid JSON - never returns an unverified event.
      *
+     * Every event includes a boolean `test_mode` key: true when the payment was created with a test
+     * key (ak_test_...). Test and live events go to the same webhook URL, so never fulfil a real
+     * order from an event where `test_mode` is true.
+     *
      * @return array<string, mixed>
      */
     public static function parseEvent(string $rawBody, ?string $signatureHeader, string $webhookSecret): array

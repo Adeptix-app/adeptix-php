@@ -88,6 +88,12 @@ try {
     exit;
 }
 
+if (!empty($event['test_mode'])) {
+    // A test-key payment - acknowledge it, but never fulfil a real order from it.
+    http_response_code(200);
+    exit;
+}
+
 if ($event['event'] === 'payment.paid') {
     // mark your order paid - $event['order_ref'] / $event['transaction_id']
 } elseif ($event['event'] === 'crypto_payment.matched') {
@@ -98,6 +104,21 @@ http_response_code(200);
 ```
 
 Handlers should be idempotent — the same event can be delivered more than once.
+
+## Test mode
+
+Create a **Test** key (`ak_test_...`) from the dashboard's API Keys page and pass it to
+`AdeptixClient` — nothing else in the client changes. No real payment is made and nothing touches a
+blockchain; the amount you send picks the outcome:
+
+- Merchant payments: an amount ending in `.00` is `paid` immediately (and a `payment.paid` webhook is
+  sent), `.01` is `failed` (no webhook), anything else stays `pending`.
+- Crypto payments: a requested amount ending in `.00` is `matched` immediately (and a
+  `crypto_payment.matched` webhook is sent); anything else stays `pending` until it expires.
+  `pay_to_address` is the literal string `"sandbox"`.
+
+Test webhooks go to the same URL as live ones with `"test_mode": true` — make your production handler
+ignore them, as in the example above. See **https://docs.adeptix.app** for details.
 
 ## Error handling
 
