@@ -7,20 +7,17 @@ Full API reference: **https://docs.adeptix.app**
 
 ## Install
 
-```bash
-composer require adeptix/adeptix-php
+This SDK installs straight from GitHub. Add the repository to your project's `composer.json`:
+
+```json
+"repositories": [{ "type": "vcs", "url": "https://github.com/Adeptix-app/adeptix-php" }]
 ```
 
-> **Not on Packagist yet.** Until it is, add this repository to your project's `composer.json`
-> and require the `dev-main` branch:
->
-> ```json
-> "repositories": [{ "type": "vcs", "url": "https://github.com/Adeptix-app/adeptix-php" }]
-> ```
->
-> ```bash
-> composer require adeptix/adeptix-php:dev-main
-> ```
+then require it:
+
+```bash
+composer require adeptix/adeptix-php:dev-main
+```
 
 Requires PHP 8.0+ with the `curl` and `json` extensions (bundled with virtually every PHP
 install). This is also the foundation the official WooCommerce/WHMCS/PrestaShop/OpenCart plugins
