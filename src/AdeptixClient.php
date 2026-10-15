@@ -29,6 +29,7 @@ class AdeptixClient
 
     private ?CryptoPayments $cryptoPayments = null;
     private ?Payments $payments = null;
+    private ?Providers $providers = null;
 
     /**
      * @param callable(string, string, array<int, string>, ?string): array{0: int, 1: string}|null $httpTransport
@@ -91,11 +92,20 @@ class AdeptixClient
         return $this->payments ??= new Payments($this);
     }
 
+    /** Discovery for the Merchant Payments API: the providers you can pass as `provider`. */
+    public function providers(): Providers
+    {
+        return $this->providers ??= new Providers($this);
+    }
+
     /**
      * @param array<string, mixed>|null $body
+     * @param string|null $idempotencyKey Sent as the `Idempotency-Key` header (POST creation endpoints):
+     *   a retry with the same key and the same request returns the original response instead of
+     *   creating a duplicate. Still never retried automatically by this client.
      * @return array<string, mixed>
      */
-    public function request(string $method, string $path, ?array $body = null): array
+    public function request(string $method, string $path, ?array $body = null, ?string $idempotencyKey = null): array
     {
         $url = $this->baseUrl . $path;
         $isRetryable = $method === 'GET';
@@ -103,6 +113,9 @@ class AdeptixClient
 
         while (true) {
             $headers = ['Authorization: Bearer ' . $this->apiKey];
+            if ($idempotencyKey !== null && $idempotencyKey !== '') {
+                $headers[] = 'Idempotency-Key: ' . $idempotencyKey;
+            }
             $payload = null;
 
             if ($body !== null) {
