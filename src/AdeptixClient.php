@@ -155,7 +155,8 @@ class AdeptixClient
                 $statusCode,
                 $decoded['error'],
                 $decoded['message'] ?? null,
-                $decoded['details'] ?? null
+                $decoded['details'] ?? null,
+                isset($decoded['minimum_amount']) && is_string($decoded['minimum_amount']) ? $decoded['minimum_amount'] : null
             );
         }
     }

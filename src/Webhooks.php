@@ -30,6 +30,21 @@ class Webhooks
     public const DEFAULT_TOLERANCE_SECONDS = 300;
 
     /**
+     * Every event type this SDK version knows. crypto_payment.underpaid is sent instead of
+     * crypto_payment.matched when slightly LESS than requested was matched: fulfil only if you accept
+     * `received_amount`. Slightly MORE counts as paid: crypto_payment.matched with `overpaid` => true
+     * plus `expected_amount`, `received_amount`, `difference`, `difference_pct` and `match_method`.
+     * New types can be added: acknowledge the ones you don't handle.
+     */
+    public const EVENT_TYPES = [
+        'payment.paid',
+        'payment.failed',
+        'crypto_payment.matched',
+        'crypto_payment.underpaid',
+        'crypto_payment.expired',
+    ];
+
+    /**
      * Verifies the `Adeptix-Signature` header (`t=<unix seconds>,v1=<hex>`): an HMAC-SHA256 over
      * "<t>.<raw body>", with replay protection. Returns false (never throws) for a missing or
      * malformed header, a timestamp more than $toleranceSeconds from now, or a signature that matches
@@ -91,7 +106,8 @@ class Webhooks
      * or the body isn't valid JSON - never returns an unverified event. Branch on `$event['event']`,
      * acknowledge (2xx) types you don't handle, and deduplicate on `$event['id']`.
      *
-     * Known types: payment.paid, payment.failed, crypto_payment.matched, crypto_payment.expired.
+     * Known types: self::EVENT_TYPES (payment.paid, payment.failed, crypto_payment.matched,
+     * crypto_payment.underpaid, crypto_payment.expired).
      *
      * @return array<string, mixed>
      */

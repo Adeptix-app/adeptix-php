@@ -16,7 +16,7 @@ This SDK installs straight from GitHub. Add the repository to your project's `co
 then require the release series:
 
 ```bash
-composer require adeptix/adeptix-php:^0.2
+composer require adeptix/adeptix-php:^0.3
 ```
 
 (Use `adeptix/adeptix-php:dev-main` instead to track the latest commit on `main`.)
@@ -49,7 +49,9 @@ $request = $client->crypto()->createPaymentRequest([
 // matched by exact amount, not by a per-request address.
 
 $status = $client->crypto()->getPaymentRequest($request['payment_request_id']);
-// $status['status']: "pending" | "matched" | "expired"
+// $status['status']: "pending" | "matched" | "underpaid" | "expired"
+// (matched = paid, including slightly more than requested; underpaid: slightly less arrived and was
+// matched, you decide; see the webhook below)
 ```
 
 ### Merchant Payments API
@@ -157,6 +159,11 @@ if ($event['event'] === 'payment.paid') {
     // mark your order paid - $event['order_ref'] / $event['transaction_id']
 } elseif ($event['event'] === 'crypto_payment.matched') {
     // mark your order paid - $event['order_ref'] / $event['payment_request_id']
+    // (!empty($event['overpaid'])): slightly more than requested arrived; still paid, the extra is
+    // not refunded automatically)
+} elseif ($event['event'] === 'crypto_payment.underpaid') {
+    // slightly less arrived and was matched: compare $event['received_amount'] with
+    // $event['expected_amount'] and fulfil only if you accept it
 } elseif ($event['event'] === 'payment.failed' || $event['event'] === 'crypto_payment.expired') {
     // a (test) card payment failed / a crypto request timed out unpaid
 }
