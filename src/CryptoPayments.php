@@ -28,6 +28,8 @@ class CryptoPayments
      * `expires_in_minutes` (how long the customer has to pay: an integer 10-60, default 20; any other
      * value fails with error code `invalid_expiry`). An `amount` below the asset's `min_amount` fails
      * with error code `amount_below_minimum` (see AdeptixApiException::getMinimumAmount()).
+     * `pay_to_address` is returned per request and can differ between requests: always show the one
+     * from this response.
      *
      * @param array{chain: string, token: string, amount: string, order_ref?: string, customer_email?: string, description?: string, return_url?: string, cancel_url?: string, metadata?: array<string, string>, idempotency_key?: string, expires_in_minutes?: int} $params
      * @return array<string, mixed> payment_request_id, chain, token, pay_to_address, amount, expires_at, checkout_url, order_ref, return_url, cancel_url, metadata, description

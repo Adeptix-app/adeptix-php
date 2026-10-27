@@ -16,6 +16,7 @@ class AdeptixApiException extends Exception
     /** Every error code the API documents today. New codes may be added: compare, don't exhaustively match. */
     public const KNOWN_ERROR_CODES = [
         'unauthorized',
+        'email_unverified',
         'invalid_request',
         'not_found',
         'platform_not_configured',

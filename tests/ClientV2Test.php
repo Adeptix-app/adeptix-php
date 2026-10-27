@@ -107,6 +107,29 @@ final class ClientV2Test extends TestCase
         }
     }
 
+    public function testEmailUnverifiedSurfacesOnBothCreateCalls(): void
+    {
+        $this->assertContains('email_unverified', AdeptixApiException::KNOWN_ERROR_CODES);
+        $this->assertSame(count(AdeptixApiException::KNOWN_ERROR_CODES), count(array_unique(AdeptixApiException::KNOWN_ERROR_CODES)));
+        $body = ['error' => 'email_unverified', 'message' => 'Verify your email address in the dashboard before creating live payments. Test keys are not affected.'];
+        $calls = [];
+        $client = $this->recordingClient(403, $body, $calls);
+        try {
+            $client->payments()->create(['amount' => '1', 'currency' => 'USD', 'email' => 'a@b.com', 'provider' => 'stripe']);
+            $this->fail('Expected an exception');
+        } catch (AdeptixApiException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+            $this->assertSame('email_unverified', $e->getErrorCode());
+        }
+        try {
+            $client->crypto()->createPaymentRequest(['chain' => 'bsc', 'token' => 'USDT', 'amount' => '10.00']);
+            $this->fail('Expected an exception');
+        } catch (AdeptixApiException $e) {
+            $this->assertSame('email_unverified', $e->getErrorCode());
+        }
+        $this->assertCount(2, $calls, 'a 403 is never retried');
+    }
+
     public function testProvidersListAndGet(): void
     {
         $calls = [];

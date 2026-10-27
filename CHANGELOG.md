@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.1
+
+- **Verified email**: a live key now gets `403` with the new error code `email_unverified` from
+  `payments()->create()` and `crypto()->createPaymentRequest()` until the account's email address is
+  verified in the dashboard. Test keys are not affected. The code is added to
+  `AdeptixApiException::KNOWN_ERROR_CODES`.
+
 ## 0.3.0
 
 All additions; existing code keeps working unchanged (the plugins that bundle this SDK are unaffected).

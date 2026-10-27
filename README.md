@@ -46,7 +46,8 @@ $request = $client->crypto()->createPaymentRequest([
 // Show $request['amount'] and $request['pay_to_address'] to the customer - or send them to
 // $request['checkout_url'], a hosted payment page (amount, address, QR code, countdown, live status).
 // $request['amount'] may differ slightly from "49.00" - see the docs' note on how deposits are
-// matched by exact amount, not by a per-request address.
+// matched by exact amount. The address can differ between requests: always show the one
+// from this response.
 
 $status = $client->crypto()->getPaymentRequest($request['payment_request_id']);
 // $status['status']: "pending" | "matched" | "underpaid" | "expired"
